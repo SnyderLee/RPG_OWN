@@ -22,16 +22,18 @@ public class FightManager : MonoBehaviour
         }
 
     }
-    public void CheckForEncounter()
+    public bool CheckForEncounter()
     {
         if (Random.Range(0, 100) <= chanceToEncounter) 
         {
            
             Debug.Log("Start Encounter");
+            return true;
         }
         else
         {
             Debug.Log("No Encounter");
+            return false;
         }
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using static UnityEngine.InputSystem.InputAction;
 
 //BaseCharacter is the base of a character
@@ -10,10 +11,24 @@ public class BaseCharacterController : MonoBehaviour
     [SerializeField] private float movementSpeed;
     [Range(0,1)][SerializeField] private float slowedFactor;
     private bool isSlowed;
+    private bool isPlayerInBattle;
+    private Vector3Int currentPosition;
+    private Vector3Int lastEncounterPosition;
+
+    public Tilemap tilemap
+    {
+        get
+        {
+            if (m_tilemap == null) m_tilemap = FindObjectOfType<Tilemap>();
+            return m_tilemap;
+        }
+    }
+    private Tilemap m_tilemap;  
 
     private void Start()
     {
         isSlowed = false;
+        isPlayerInBattle = false;
     }
 
     /// <summary>
@@ -29,6 +44,7 @@ public class BaseCharacterController : MonoBehaviour
     //This is now a FIXEDupdate
     private void FixedUpdate()
     {
+        if (isPlayerInBattle) return;
         //var actualmovementSpeed = isSlowed ? movementSpeed * slowedFactor : movementSpeed;
         var actualmovementSpeed = movementSpeed;
         if (isSlowed) actualmovementSpeed *= slowedFactor;
@@ -36,6 +52,7 @@ public class BaseCharacterController : MonoBehaviour
             
         }
         transform.Translate(new Vector3(movementInput.x, movementInput.y, 0) * Time.deltaTime * actualmovementSpeed);
+        currentPosition = tilemap.WorldToCell(transform.position); 
     }
 
   
@@ -44,6 +61,15 @@ public class BaseCharacterController : MonoBehaviour
         if (col.gameObject.CompareTag("Swamp"))
             {
                 isSlowed = true;
+        }
+        else if(col.gameObject.CompareTag("FightEncounter"))
+        {
+      
+            if (currentPosition == lastEncounterPosition)
+            {
+               lastEncounterPosition = currentPosition;
+               isPlayerInBattle = FightManager.Instance.CheckForEncounter();
+            }
         }
     }
     private void OnTriggerExit2D(Collider2D col)
@@ -54,13 +80,13 @@ public class BaseCharacterController : MonoBehaviour
         }
     }
 
-    //private void OnTriggerEnter2D(Collider2D col)
-    //{
-    //    if (col.gameObject.CompareTag("FightEn"))
-    //    {
-    //        CheckForEncounter();
-    //    }
-    //}
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.gameObject.CompareTag("FightEncounter"))
+        {
+            CheckForEncounter();
+        }
+    }
     private void CheckForEncounter()
     {
         FightManager.Instance.CheckForEncounter(); 
