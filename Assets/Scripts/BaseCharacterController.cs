@@ -53,4 +53,16 @@ public class BaseCharacterController : MonoBehaviour
             isSlowed = false;
         }
     }
+
+    //private void OnTriggerEnter2D(Collider2D col)
+    //{
+    //    if (col.gameObject.CompareTag("FightEn"))
+    //    {
+    //        CheckForEncounter();
+    //    }
+    //}
+    private void CheckForEncounter()
+    {
+        FightManager.Instance.CheckForEncounter(); 
+    }
 }
