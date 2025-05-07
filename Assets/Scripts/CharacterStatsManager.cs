@@ -22,7 +22,10 @@ public class CharacterStatsManager: MonoBehaviour
 
 
         }
-        else
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
         {
             Destroy(gameObject);
         }
